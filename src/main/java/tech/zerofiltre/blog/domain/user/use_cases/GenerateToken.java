@@ -22,11 +22,28 @@ public class GenerateToken {
         this.userProvider = userProvider;
     }
 
-    public Token byRefreshToken(String refreshToken) throws InvalidTokenException {
-        VerificationToken verificationToken = verifyToken.execute(refreshToken);
-        User user = verificationToken.getUser();
-        JwtToken jwTtoken = jwtTokenProvider.generate(user);
-        return build(verificationToken, jwTtoken);
+    public Token byRefreshToken(String refreshToken) {
+        return null;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public Token byUser(User user) {
+
+        return null;
     }
 
     public Token byEmail(String email) throws UserNotFoundException {
@@ -35,21 +52,4 @@ public class GenerateToken {
         return byUser(user);
     }
 
-    public Token byUser(User user) {
-        VerificationToken verificationToken = verificationTokenProvider.generate(user, DURATION_IN_SECONDS);
-        JwtToken jwTtoken = jwtTokenProvider.generate(user);
-        return build(verificationToken, jwTtoken);
-
-    }
-
-    private Token build(VerificationToken verificationToken, JwtToken jwTtoken) {
-        Token token = new Token();
-        token.setAccessToken(jwTtoken.getAccessToken());
-        token.setRefreshToken(verificationToken.getToken());
-        token.setAccessTokenExpiryDateInSeconds(jwTtoken.getExpiryDateInSeconds());
-        token.setRefreshTokenExpiryDateInSeconds(verificationToken.getExpiryDate().toEpochSecond(ZoneOffset.UTC));
-        token.setTokenType("Bearer");
-
-        return token;
-    }
 }
