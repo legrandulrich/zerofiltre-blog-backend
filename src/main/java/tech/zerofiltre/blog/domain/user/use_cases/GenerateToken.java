@@ -22,34 +22,37 @@ public class GenerateToken {
         this.userProvider = userProvider;
     }
 
-    public Token byRefreshToken(String refreshToken) {
-        return null;
+    public Token byRefreshToken(String refreshToken) throws InvalidTokenException {
+        VerificationToken verificationToken = verifyToken.execute(refreshToken);
+        User user = verificationToken.getUser();
+        JwtToken jwTtoken = jwtTokenProvider.generate(user);
+        return build(verificationToken, jwTtoken);
+
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public Token byUser(User user) {
 
-        return null;
+        VerificationToken verificationToken = verificationTokenProvider.generate(user, DURATION_IN_SECONDS);
+        JwtToken jwTtoken = jwtTokenProvider.generate(user);
+        return build(verificationToken, jwTtoken);
     }
+
 
     public Token byEmail(String email) throws UserNotFoundException {
         User user = userProvider.userOfEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("The connected user was not found", email));
         return byUser(user);
+    }
+
+    private Token build(VerificationToken verificationToken, JwtToken jwTtoken) {
+        Token token = new Token();
+        token.setAccessToken(jwTtoken.getAccessToken());
+        token.setRefreshToken(verificationToken.getToken());
+        token.setAccessTokenExpiryDateInSeconds(jwTtoken.getExpiryDateInSeconds());
+        token.setRefreshTokenExpiryDateInSeconds(verificationToken.getExpiryDate().toEpochSecond(ZoneOffset.UTC));
+        token.setTokenType("Bearer");
+
+        return token;
     }
 
 }
