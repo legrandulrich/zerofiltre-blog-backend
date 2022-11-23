@@ -5,6 +5,8 @@ podTemplate(label: label, containers: [
         containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
         containerTemplate(name: 'kubectl', image: 'roffe/kubectl', command: 'cat', ttyEnabled: true),
         containerTemplate(name: 'maven', image: 'maven:3.8.4-openjdk-11', command: 'cat', ttyEnabled: true)
+        //container template pour helm
+
 ],
         volumes: [
                 hostPathVolume(mountPath: '/root/.m2', hostPath: '/home/jenkins/.m2'),
@@ -32,7 +34,7 @@ podTemplate(label: label, containers: [
                 }
             }
 
-            stage('Sonarqube Analysis') {
+            /*stage('Sonarqube Analysis') {
                 withSonarQubeEnv('SonarCloudServer') {
                     container('maven') {
                         sh " mvn sonar:sonar -s .m2/settings.xml -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true"
@@ -44,7 +46,7 @@ podTemplate(label: label, containers: [
                         error "Pipeline aborted due to quality gate failure: ${qg.status}"
                     }
                 }
-            }
+            }*/
 
 
             withEnv(["api_image_tag=${getTag(env.BUILD_NUMBER, env.BRANCH_NAME)}",
@@ -153,7 +155,7 @@ String getLimitsCPU(String branchName) {
     if (branchName == 'main') {
         return '1'
     } else {
-        return '0.5'
+        return '0.2'
     }
 }
 
@@ -161,7 +163,7 @@ String getLimitsMemory(String branchName) {
     if (branchName == 'main') {
         return '1.2Gi'
     } else {
-        return '1.2Gi'
+        return '0.5Gi'
     }
 }
 
@@ -172,12 +174,14 @@ String getReplicas(String branchName) {
     return (branchName == 'ready') ? '1' : '1'
 }
 
+//TODO
 String getApiHost(String branchName) {
-    String prefix = "blog-api"
+    String prefix = "blog-api"+"<nom-prenom>"
     String suffix = ".zerofiltre.tech"
     if (branchName == 'main') {
         return prefix + suffix
     }
+    //Ex: blog-api-ngassambridge.zerofiltre.tech
     return (branchName == 'ready') ? prefix + "-uat" + suffix : prefix + "-dev" + suffix
 }
 
