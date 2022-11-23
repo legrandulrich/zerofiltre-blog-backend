@@ -153,7 +153,7 @@ String getLimitsCPU(String branchName) {
     if (branchName == 'main') {
         return '1'
     } else {
-        return '0.5'
+        return '0.2'
     }
 }
 
@@ -161,7 +161,7 @@ String getLimitsMemory(String branchName) {
     if (branchName == 'main') {
         return '1.2Gi'
     } else {
-        return '1.2Gi'
+        return '0.5Gi'
     }
 }
 
@@ -173,11 +173,12 @@ String getReplicas(String branchName) {
 }
 
 String getApiHost(String branchName) {
-    String prefix = "blog-api"
+    String prefix = "blog-api"+"<nom-prenom>"
     String suffix = ".zerofiltre.tech"
     if (branchName == 'main') {
         return prefix + suffix
     }
+    //Ex: blog-api-ngaswilly.zerofiltre.tech
     return (branchName == 'ready') ? prefix + "-uat" + suffix : prefix + "-dev" + suffix
 }
 

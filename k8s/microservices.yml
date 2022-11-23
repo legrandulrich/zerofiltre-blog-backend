@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: zerofiltretech-${env_name}
-  name: zerofiltretech-blog-${env_name}
+  namespace: <votre-namespace>
+  name: blog-backend
 spec:
   minReadySeconds: 30
   progressDeadlineSeconds: 300
   replicas: ${replicas}
   selector:
     matchLabels:
-      app: zerofiltretech-blog-${env_name}
+      app: blog-backend
   template:
     metadata:
       labels:
-        app: zerofiltretech-blog-${env_name}
+        app: blog-backend
       annotations:
         vault.hashicorp.com/agent-inject: 'true'
         vault.hashicorp.com/role: 'internal-app'
@@ -33,7 +33,7 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 6379
-        - name: zerofiltretech-blog-${env_name}
+        - name: blog-backend
           image: imzerofiltre/zerofiltretech-blog:0.0.1
           imagePullPolicy: IfNotPresent
           ports:
@@ -180,21 +180,21 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: zerofiltretech-${env_name}
-  name: zerofiltretech-blog-${env_name}
+  namespace: <votre-namespace>
+  name: blog-backend
 spec:
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
   selector:
-    app: zerofiltretech-blog-${env_name}
+    app: blog-backend
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  namespace: zerofiltretech-${env_name}
-  name: zerofiltretech-blog-${env_name}
+  namespace: <votre-namespace>
+  name: blog-backend
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     # add an annotation indicating the issuer to use.
@@ -206,7 +206,7 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: zerofiltretech-blog-${env_name}
+              serviceName: blog-backend
               servicePort: 80
   tls: # < placing a host in the TLS config will indicate a certificate should be created
     - hosts:
