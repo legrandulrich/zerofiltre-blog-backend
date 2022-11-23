@@ -5,6 +5,8 @@ podTemplate(label: label, containers: [
         containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
         containerTemplate(name: 'kubectl', image: 'roffe/kubectl', command: 'cat', ttyEnabled: true),
         containerTemplate(name: 'maven', image: 'maven:3.8.4-openjdk-11', command: 'cat', ttyEnabled: true)
+        //container template pour helm
+
 ],
         volumes: [
                 hostPathVolume(mountPath: '/root/.m2', hostPath: '/home/jenkins/.m2'),
@@ -32,7 +34,7 @@ podTemplate(label: label, containers: [
                 }
             }
 
-            stage('Sonarqube Analysis') {
+            /*stage('Sonarqube Analysis') {
                 withSonarQubeEnv('SonarCloudServer') {
                     container('maven') {
                         sh " mvn sonar:sonar -s .m2/settings.xml -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true"
@@ -44,7 +46,7 @@ podTemplate(label: label, containers: [
                         error "Pipeline aborted due to quality gate failure: ${qg.status}"
                     }
                 }
-            }
+            }*/
 
 
             withEnv(["api_image_tag=${getTag(env.BUILD_NUMBER, env.BRANCH_NAME)}",
@@ -111,17 +113,15 @@ def runApp() {
             sh """
                   echo "Branch:" ${env.BRANCH_NAME}
                   echo "env:" ${env_name}
-                  envsubst < microservices.yml | kubectl apply -f -
+                  kubectl apply -f bootcamp/.
+                  envsubst < microservices.yml | kubectl apply --record -f -
+                  if ! kubectl rollout status -w deployment/blog-backend-<nom-prenom> -n zerofiltre-bootcamp; then
+                     kubectl rollout undo deployment.v1.apps/blog-backend-<nom-prenom> -n zerofiltre-bootcamp
+                     kubectl rollout status deployment/blog-backend-<nom-prenom> -n zerofiltre-bootcamp
+                     exit 1
+                 fi
                """
         }
-        sh """
-                kubectl set image deployment/zerofiltretech-blog-${env_name} zerofiltretech-blog-${env_name}=${api_image_tag} -n zerofiltretech-${env_name} --record
-                if ! kubectl rollout status -w deployment/zerofiltretech-blog-${env_name} -n zerofiltretech-${env_name}; then
-                    kubectl rollout undo deployment.v1.apps/zerofiltretech-blog-${env_name} -n zerofiltretech-${env_name}
-                    kubectl rollout status deployment/zerofiltretech-blog-${env_name} -n zerofiltretech-${env_name}
-                    exit 1
-                fi
-            """
     }
 }
 
@@ -137,7 +137,7 @@ String getRequestsCPU(String branchName) {
     if (branchName == 'main') {
         return '0.5'
     } else {
-        return '0.1'
+        return '0.5'
     }
 }
 
@@ -145,7 +145,7 @@ String getRequestsMemory(String branchName) {
     if (branchName == 'main') {
         return '1Gi'
     } else {
-        return '0.5Gi'
+        return '1Gi'
     }
 }
 
@@ -153,7 +153,7 @@ String getLimitsCPU(String branchName) {
     if (branchName == 'main') {
         return '1'
     } else {
-        return '0.5'
+        return '1'
     }
 }
 
@@ -172,17 +172,19 @@ String getReplicas(String branchName) {
     return (branchName == 'ready') ? '1' : '1'
 }
 
+//TODO
 String getApiHost(String branchName) {
-    String prefix = "blog-api"
+    String prefix = "blog-api"+"<nom-prenom>"
     String suffix = ".zerofiltre.tech"
     if (branchName == 'main') {
         return prefix + suffix
     }
+    //Ex: blog-api-ngassambridge.zerofiltre.tech
     return (branchName == 'ready') ? prefix + "-uat" + suffix : prefix + "-dev" + suffix
 }
 
 String getTag(String buildNumber, String branchName) {
-    String tag = "imzerofiltre/zerofiltretech-blog:" + UUID.randomUUID().toString() + '-' + buildNumber
+    String tag = "imzerofiltre/blog-backend-<nom-prenom>:" + UUID.randomUUID().toString() + '-' + buildNumber
     if (branchName == 'main') {
         return tag + '-stable'
     }
@@ -196,5 +198,3 @@ def sendEmail() {
             subject: env.COMMIT_AUTHOR_NAME + " build #${env.BUILD_NUMBER} is a ${currentBuild.currentResult} - (${currentBuild.fullDisplayName})",
             body: "Check console output at: ${url}/console" + "\n")
 }
-
-
