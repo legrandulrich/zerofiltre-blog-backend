@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: <votre-namespace>
-  name: zerofiltre-blog-api-nom-prenom
+  name: zerofiltre-blog-api-ngassam-william
+  namespace: zerofiltre-bootcamp
 data:
   logging_level_org_springframework: DEBUG
   logging_level_org_hibernate_sql: DEBUG
@@ -17,9 +17,9 @@ data:
 
   spring_mail_host: smtp.gmail.com
   spring_mail_port: "587"
-  spring_mail_username:
-  spring_datasource_username: <user_bd_mysql_cloud>
-  spring_datasource_url: jdbc:mysql://<url_de_votre_bd_mysql_sur_le_cloud>
+  spring_mail_username: ngaswilly77@gmail.com
+  spring_datasource_username: sql7593951
+  spring_datasource_url: jdbc:mysql://sql7.freesqldatabase.com:3306/sql7593951
   hibernate_ddl_auto: update
   zerofiltre_env: dev
 

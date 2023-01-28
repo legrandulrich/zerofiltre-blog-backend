@@ -96,12 +96,12 @@ zerofiltre:
     api:
       github:
         root-url: https://api.github.com/
-        client-id: ${GITHUB_CLIENT_ID}
-        client-secret: ${GITHUB_CLIENT_SECRET}
+        client-id:
+        client-secret:
       stackoverflow:
         version: 2.3
         root-url: https://api.stackexchange.com/
-        key: ${STACKOVERFLOW_KEY}
+        key:
     entrypoints:
       rest:
         api-version: 1.0

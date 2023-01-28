@@ -103,12 +103,12 @@ zerofiltre:
     api:
       github:
         root-url: https://api.github.com/
-        client-id: 9b6bffa9841d19dfd8aa
-        client-secret: ${GITHUB_CLIENT_SECRET}
+        client-id:
+        client-secret:
       stackoverflow:
         version: 2.3
         root-url: https://api.stackexchange.com/
-        key: ZAeo5W0MnZPxiEBgb99MvA((
+        key:
     entrypoints:
       rest:
         api-version: 1.0
