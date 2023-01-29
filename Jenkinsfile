@@ -48,7 +48,7 @@ podTemplate(label: label, containers: [
             }*/
 
 
-            withEnv(["api_image_name='imzerofiltre/blog-backend-ngaswilly-william'"
+            withEnv(["api_image_name='imzerofiltre/blog-backend-ngaswilly-william'",
                      "api_image_tag=${getTag(env.BUILD_NUMBER, env.BRANCH_NAME)}",
                      "env_name=${getEnvName(env.BRANCH_NAME)}",
                      "api_host=${getApiHost(env.BRANCH_NAME)}",
