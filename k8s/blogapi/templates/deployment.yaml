@@ -43,25 +43,6 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: http
-            periodSeconds: 30
-            timeoutSeconds: 5  
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: http
-            periodSeconds: 30
-            timeoutSeconds: 5
-          startupProbe:
-            httpGet:
-              path: /actuator/health
-              port: 80
-            initialDelaySeconds: 300
-            timeoutSeconds: 5
-            failureThreshold: 10  
           env:
             {{- range $key, $val := .Values.configMap }}
             - name: {{ upper $key }}
