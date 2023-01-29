@@ -4,9 +4,8 @@ def label = "worker-${UUID.randomUUID().toString()}"
 podTemplate(label: label, containers: [
         containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
         containerTemplate(name: 'kubectl', image: 'roffe/kubectl', command: 'cat', ttyEnabled: true),
-        containerTemplate(name: 'maven', image: 'maven:3.8.4-openjdk-11', command: 'cat', ttyEnabled: true)
-        //container template pour helm
-
+        containerTemplate(name: 'maven', image: 'maven:3.8.4-openjdk-11', command: 'cat', ttyEnabled: true),
+        containerTemplate(name: 'helm', image: 'alpine/helm', command: 'cat', ttyEnabled: true)
 ],
         volumes: [
                 hostPathVolume(mountPath: '/root/.m2', hostPath: '/home/jenkins/.m2'),
@@ -49,7 +48,8 @@ podTemplate(label: label, containers: [
             }*/
 
 
-            withEnv(["api_image_tag=${getTag(env.BUILD_NUMBER, env.BRANCH_NAME)}",
+            withEnv(["api_image_name='imzerofiltre/blog-backend-ngaswilly-william'"
+                     "api_image_tag=${getTag(env.BUILD_NUMBER, env.BRANCH_NAME)}",
                      "env_name=${getEnvName(env.BRANCH_NAME)}",
                      "api_host=${getApiHost(env.BRANCH_NAME)}",
                      "replicas=${getReplicas(env.BRANCH_NAME)}",
@@ -98,28 +98,28 @@ podTemplate(label: label, containers: [
 def buildAndPush(dockerUser, dockerPassword) {
     container('docker') {
         sh """
-                docker build -t ${api_image_tag}  --pull --no-cache .
+                docker build -t ${api_image_name}:${api_image_tag} --pull --no-cache .
                 echo "Image build complete"
                 docker login -u $dockerUser -p $dockerPassword
-                docker push ${api_image_tag}
+                docker push ${api_image_name}:${api_image_tag}
                 echo "Image push complete"
          """
     }
 }
 
 def runApp() {
-    container('kubectl') {
+    container('helm') {
         dir('k8s') {
             sh """
                   echo "Branch:" ${env.BRANCH_NAME}
                   echo "env:" ${env_name}
-                  kubectl apply -f bootcamp/.
-                  envsubst < microservices.yml | kubectl apply --record -f -
-                  if ! kubectl rollout status -w deployment/blog-backend-<nom-prenom> -n zerofiltre-bootcamp; then
-                     kubectl rollout undo deployment.v1.apps/blog-backend-<nom-prenom> -n zerofiltre-bootcamp
-                     kubectl rollout status deployment/blog-backend-<nom-prenom> -n zerofiltre-bootcamp
-                     exit 1
-                 fi
+                  sed -i "s/^version:.*$/version: ${api_image_tag}/" blogapi/Chart.yaml
+                  sed -i "s/^appVersion:.*$/appVersion: ${api_image_tag}/" blogapi/Chart.yaml
+                  helm upgrade --install --set image.tag='${api_image_tag}' --image.repository=${api_image_name} \ 
+                  --set ingress.hosts[0].host=${api_host} --set ingress.tls[0].hosts[0]=${api_host} \
+                  --set resources.limits.cpu=${limits_cpu} --set resources.limits.memory=${limits_memory} \
+                  --set resources.requests.cpu=${requests_cpu} --set resources.requests.memory=${requests_memory} \
+                  --namespace zerofiltre-bootcamp blogapi
                """
         }
     }
@@ -174,7 +174,7 @@ String getReplicas(String branchName) {
 
 //TODO
 String getApiHost(String branchName) {
-    String prefix = "blog-api"+"<nom-prenom>"
+    String prefix = "blog-api-"+"ngaswilly-william"
     String suffix = ".zerofiltre.tech"
     if (branchName == 'main') {
         return prefix + suffix
@@ -184,7 +184,7 @@ String getApiHost(String branchName) {
 }
 
 String getTag(String buildNumber, String branchName) {
-    String tag = "imzerofiltre/blog-backend-<nom-prenom>:" + UUID.randomUUID().toString() + '-' + buildNumber
+    String tag = UUID.randomUUID().toString() + '-' + buildNumber
     if (branchName == 'main') {
         return tag + '-stable'
     }

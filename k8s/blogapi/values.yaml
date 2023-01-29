@@ -1,0 +1,88 @@
+replicaCount: 1
+
+image:
+  repository: xxxxxxx
+  pullPolicy: IfNotPresent
+  tag: xxxxxxx
+
+imagePullSecrets: []
+nameOverride: "blog-backend-ngassam-william"
+fullnameOverride: "blog-backend-ngassam-william"
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: xxxxxxx
+      paths:
+        - path: /
+  tls:
+  - secretName: xxxxxxx
+    hosts:
+    - xxxxxxx
+
+resources:
+  limits:
+    cpu: xxxxxxx
+    memory: xxxxxxx
+  requests:
+    cpu: xxxxxxx
+    memory: xxxxxxx
+
+configMap:
+  logging_level_org_springframework: DEBUG
+  logging_level_org_hibernate_sql: DEBUG
+  logging_level_tech_zerofiltre: DEBUG
+  server_port: "80"
+  throttling_capacity: "5"
+  throttling_time_seconds: "10"
+  spring_liquibase_changelog: classpath:/liquibase/db/changelog/db.changelog-dev.yaml
+  spring_mail_host: smtp.gmail.com
+  spring_mail_port: "585"
+  spring_mail_username: ngaswilly77@gmail.com
+  spring_datasource_username: sql7593951
+  spring_datasource_url: jdbc:mysql://sql7.freesqldatabase.com:3306/sql7593951 # Les BD expirent en un jour sur le cloud
+  hibernate_ddl_auto: update
+  zerofiltre_env: dev
+  security_jwt_expiration: "60"
+  security_verification_token_expiration: "604800"
+  security_jwt_uri: /auth/**
+  allowed_origins_pattern: '*'
+  reminder_rate: "864000000" #10 days
+  reminder_initial_delay: "864000000" #10 days
+
+secret: 
+  security_jwt_secret: JwtSecretKey 
+  spring_datasource_password: BhjE9KJMZb
+  spring_mail_password: BhjE9KJMZb
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
