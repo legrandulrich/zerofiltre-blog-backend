@@ -6,8 +6,8 @@ image:
   tag: xxxxxxx
 
 imagePullSecrets: []
-nameOverride: "blog-backend-ngassam-william"
-fullnameOverride: "blog-backend-ngassam-william"
+nameOverride: "blogbackendngassamwilliam"
+fullnameOverride: "blogbackendngassamwilliam"
 
 serviceAccount:
   create: false
