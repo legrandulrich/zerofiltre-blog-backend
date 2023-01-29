@@ -113,8 +113,8 @@ def runApp() {
             sh """
                   echo "Branch:" ${env.BRANCH_NAME}
                   echo "env:" ${env_name}
-                  sed -i "s/^version:.*$/version: ${api_image_tag}/" blogapi/Chart.yaml
-                  sed -i "s/^appVersion:.*$/appVersion: ${api_image_tag}/" blogapi/Chart.yaml
+                  sed -i 's/^version:.*$/version: ${api_image_tag}/' blogapi/Chart.yaml
+                  sed -i 's/^appVersion:.*$/appVersion: ${api_image_tag}/' blogapi/Chart.yaml
                   helm upgrade --install --set image.tag='${api_image_tag}' --image.repository=${api_image_name} \ 
                   --set ingress.hosts[0].host=${api_host} --set ingress.tls[0].hosts[0]=${api_host} \
                   --set resources.limits.cpu=${limits_cpu} --set resources.limits.memory=${limits_memory} \
