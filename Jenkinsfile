@@ -5,7 +5,7 @@ podTemplate(label: label, containers: [
         containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
         containerTemplate(name: 'kubectl', image: 'roffe/kubectl', command: 'cat', ttyEnabled: true),
         containerTemplate(name: 'maven', image: 'maven:3.8.4-openjdk-11', command: 'cat', ttyEnabled: true),
-        containerTemplate(name: 'helm', image: 'jenkins-docker-agent-with-helm:0.0.1', command: 'cat', ttyEnabled: true)
+        containerTemplate(name: 'helm', image: 'alpine/helm', command: 'cat', ttyEnabled: true)
 ],
         volumes: [
                 hostPathVolume(mountPath: '/root/.m2', hostPath: '/home/jenkins/.m2'),
@@ -113,8 +113,6 @@ def runApp() {
             sh """
                   echo "Branch:" ${env.BRANCH_NAME}
                   echo "env:" ${env_name}
-                  sed -i 's/^version:.*$/version: ${api_image_tag}/' blogapi/Chart.yaml
-                  sed -i 's/^appVersion:.*$/appVersion: ${api_image_tag}/' blogapi/Chart.yaml
                   helm upgrade --install --set image.tag='${api_image_tag}' --image.repository=${api_image_name} \ 
                   --set ingress.hosts[0].host=${api_host} --set ingress.tls[0].hosts[0]=${api_host} \
                   --set resources.limits.cpu=${limits_cpu} --set resources.limits.memory=${limits_memory} \
