@@ -63,14 +63,14 @@ spec:
             timeoutSeconds: 5
             failureThreshold: 10  
           env:
-            {{- range $key := .Values.configMap }}
+            {{- range $key, $val := .Values.configMap }}
             - name: {{ upper $key }}
               valueFrom:
                 configMapKeyRef:
                   name: {{ $fullName }}
                   key: {{ $key }}
             {{- end}}
-            {{- range $key := .Values.secret }}
+            {{- range $key, $val := .Values.secret }}
             - name: {{ upper $key }}
               valueFrom:
                 secretKeyRef:
