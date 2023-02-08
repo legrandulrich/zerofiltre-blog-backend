@@ -115,7 +115,7 @@ def runApp() {
             sh """
                   echo "Branch:" ${env.BRANCH_NAME}
                   echo "env:" ${env_name}
-                  envsubst < blogapi/values.yaml | tee blogapi/values.yaml > /dev/null
+                  envsubst < blogapi/values.yaml | tee blogapi/values.yaml
                   helm upgrade --install ${chart_name} --atomic --cleanup-on-fail --namespace ${namespace} blogapi/
                """
         }
