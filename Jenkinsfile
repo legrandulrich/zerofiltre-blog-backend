@@ -5,7 +5,7 @@ podTemplate(label: label, containers: [
         containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
         containerTemplate(name: 'kubectl', image: 'roffe/kubectl', command: 'cat', ttyEnabled: true),
         containerTemplate(name: 'maven', image: 'maven:3.8.4-openjdk-11', command: 'cat', ttyEnabled: true),
-        containerTemplate(name: 'helm', image: 'alpine/helm', command: 'cat', ttyEnabled: true)
+        containerTemplate(name: 'helm', image: 'dtzar/helm-kubectl:3.11', command: 'cat', ttyEnabled: true)
 ],
         volumes: [
                 hostPathVolume(mountPath: '/root/.m2', hostPath: '/home/jenkins/.m2'),
