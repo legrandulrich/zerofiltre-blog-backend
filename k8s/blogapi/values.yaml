@@ -1,13 +1,13 @@
 replicaCount: 1
 
 image:
-  repository: xxxxxxx
+  repository: ${api_image_name}
   pullPolicy: IfNotPresent
-  tag: xxxxxxx
+  tag: ${api_image_tag}
 
 imagePullSecrets: []
-nameOverride: "blogbackendngassamwilliam"
-fullnameOverride: "blogbackendngassamwilliam"
+nameOverride: ${chart_name}
+fullnameOverride: ${chart_name}
 
 serviceAccount:
   create: false
@@ -31,21 +31,21 @@ ingress:
     nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: letsencrypt-prod
   hosts:
-    - host: xxxxxxx
+    - host: ${api_host}
       paths:
         - path: /
   tls:
-  - secretName: xxxxxxx
+  - secretName: ${chart_name}
     hosts:
-    - xxxxxxx
+    - ${api_host}
 
 resources:
   limits:
-    cpu: xxxxxxx
-    memory: xxxxxxx
+    cpu: ${limits_cpu}
+    memory: ${limits_memory}
   requests:
-    cpu: xxxxxxx
-    memory: xxxxxxx
+    cpu: ${requests_cpu}
+    memory: ${requests_memory}
 
 configMap:
   logging_level_org_springframework: DEBUG
@@ -58,8 +58,8 @@ configMap:
   spring_mail_host: smtp.gmail.com
   spring_mail_port: "585"
   spring_mail_username: ngaswilly77@gmail.com
-  spring_datasource_username: sql7593951
-  spring_datasource_url: jdbc:mysql://sql7.freesqldatabase.com:3306/sql7593951 # Les BD expirent en un jour sur le cloud
+  spring_datasource_username: sql7596624
+  spring_datasource_url: jdbc:mysql://sql7.freesqldatabase.com:3306/sql7596624 # Les BD expirent en un jour sur le cloud
   hibernate_ddl_auto: update
   zerofiltre_env: dev
   security_jwt_expiration: "60"
@@ -71,8 +71,8 @@ configMap:
 
 secret: 
   security_jwt_secret: JwtSecretKey 
-  spring_datasource_password: BhjE9KJMZb
-  spring_mail_password: BhjE9KJMZb
+  spring_datasource_password: B7UgUgn2Ts
+  spring_mail_password: B7UgUgn2Ts
 
 autoscaling:
   enabled: false

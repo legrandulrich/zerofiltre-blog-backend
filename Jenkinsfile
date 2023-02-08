@@ -48,7 +48,9 @@ podTemplate(label: label, containers: [
             }*/
 
 
-            withEnv(["api_image_name='imzerofiltre/blog-backend-ngaswilly-william'",
+            withEnv(["namespace='zerofiltre-bootcamp'",
+                     "chart_name='blogbackendngassamwilliam'",
+                     "api_image_name='imzerofiltre/blog-backend-ngaswilly-william'",
                      "api_image_tag=${getTag(env.BUILD_NUMBER, env.BRANCH_NAME)}",
                      "env_name=${getEnvName(env.BRANCH_NAME)}",
                      "api_host=${getApiHost(env.BRANCH_NAME)}",
@@ -113,7 +115,8 @@ def runApp() {
             sh """
                   echo "Branch:" ${env.BRANCH_NAME}
                   echo "env:" ${env_name}
-                  helm upgrade --install blogbackendngassamwilliam --set image.tag='${api_image_tag}' --set image.repository=${api_image_name} --set ingress.hosts[0].host=${api_host} --set ingress.hosts[0].paths[0].path='/' --set ingress.hosts[0].paths[0].pathType=ImplementationSpecific --set ingress.tls[0].secretName=blog-backend-ngaswilly-william --set ingress.tls[0].hosts[0]=${api_host} --set resources.limits.cpu=${limits_cpu} --set resources.limits.memory=${limits_memory} --set resources.requests.cpu=${requests_cpu} --set resources.requests.memory=${requests_memory} --namespace zerofiltre-bootcamp blogapi/
+                  envsubst < blogapi/values.yaml | tee blogapi/values.yaml > /dev/null
+                  helm upgrade --install ${chart_name} --atomic --cleanup-on-fail --namespace ${namespace} blogapi/
                """
         }
     }
