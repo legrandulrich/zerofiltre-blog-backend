@@ -1,0 +1,11 @@
+groups:
+  - name: bootcamp_alert
+    rules:
+      - alert: HighMemoryUsage
+        expr: node_memory_MemTotal_bytes - node_memory_MemFree_bytes - node_memory_Buffers_bytes - node_memory_Cached_bytes > 0.9 * node_memory_MemTotal_bytes
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage on {{ $labels.instance }} has been above 90% for more than 5 minutes."

@@ -1,0 +1,51 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+    filename: /tmp/positions.yaml
+
+clients:
+    - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: zerofiltre-blog-backend
+    static_configs:
+      - targets:
+          - docker://zerofiltre-blog-backend
+        labels:
+          job: "zerofiltre-blog-backend"
+          __path__: /var/lib/docker/containers/*/*-json.log
+
+    pipeline_stages:
+    - json:
+        expressions:
+          log:
+    
+    - json:
+        expressions:
+          message: message
+          level: level
+          name: name
+          timespan: timespan
+          path: path
+          method: method
+          ip: ip
+          user_agent: user_agent
+        source: log
+
+    - geoip:
+        source: "ip"
+        db_type: "city"
+        db: "/etc/promtail/geolite2-city.mmdb"
+
+    - labels:
+        message: message
+        level: level
+        name: name
+        timespan: timespan
+        path: path
+        ip: ip
+        user_agent: user_agent
+        country: geoip_country_name
+        city: geoip_city_name
