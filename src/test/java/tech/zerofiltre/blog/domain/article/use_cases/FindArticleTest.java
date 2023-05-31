@@ -221,4 +221,36 @@ class FindArticleTest {
                 .articlesOf(0, 3, PUBLISHED, 2, null, null);
 
     }
+
+    @Test
+    void mustNotIncrementViewsCount_ifArticle_isDraft() throws ResourceNotFoundException {
+        //GIVEN
+        Article initArticle = new Article();
+        initArticle.setStatus(DRAFT);
+        initArticle.setViewsCount(1);
+        when(articleProvider.articleOfId(15)).thenReturn(Optional.of(initArticle));
+        when(articleProvider.save(any())).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
+
+        //WHEN
+        Article article = findArticle.byId(15);
+
+        //THEN
+        assertThat(article.getViewsCount()).isOne();
+    }
+
+    @Test
+    void mustNotIncrementViewsCount_ifArticle_IsInReview() throws ResourceNotFoundException {
+        //GIVEN
+        Article initArticle = new Article();
+        initArticle.setStatus(IN_REVIEW);
+        initArticle.setViewsCount(1);
+        when(articleProvider.articleOfId(15)).thenReturn(Optional.of(initArticle));
+        when(articleProvider.save(any())).thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
+
+        //WHEN
+        Article article = findArticle.byId(15);
+
+        //THEN
+        assertThat(article.getViewsCount()).isOne();
+    }
 }
