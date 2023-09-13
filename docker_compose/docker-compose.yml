@@ -1,19 +1,16 @@
+
+
+
 version: '3'
 services:
+
+  # Ce service doit dépendre de redis et mysql
   zerofiltretech-blog:
     image: imzerofiltre/zerofiltretech-blog:177_stable
     ports:
       - "80:80"
     env_file:
       - .env
-    depends_on:
-      - redis
-      - mysql
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     volumes:
       - /vault:/vault/secrets/config
 
@@ -21,19 +18,18 @@ services:
   redis:
     image: redis
     restart: always
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     ports:
       - 6379:6379
+
 
   mysql:
     image: mysql:8.0.30
     restart: always
     ports:
       - "3306:3306"
+
+    # Définir les valeur de mysql mot de passe et mot de passe route sur ${SPRING_DATASOURCE_PASSWORD}, user= ${SPRING_DATASOURCE_USERNAME}, nom de la base de données=${SPRING_DATASOURCE_DATABASE}  On peut utiliser un fichier .env pour définir les variables d'environnement(SPRING_DATASOURCE_PASSWORD, SPRING_DATASOURCE_DATABASE, SPRING_DATASOURCE_USERNAME)
+    # Vous pouvez vous servir de la documentation officielle de mysql pour plus d'informations https://hub.docker.com/_/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       MYSQL_DATABASE: ${SPRING_DATASOURCE_DATABASE}
