@@ -1,0 +1,46 @@
+version: '3'
+services:
+  zerofiltretech-blog:
+    image: imzerofiltre/zerofiltretech-blog:177_stable
+    ports:
+      - "80:80"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - mysql
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /vault:/vault/secrets/config
+
+
+  redis:
+    image: redis
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ports:
+      - 6379:6379
+
+  mysql:
+    image: mysql:8.0.30
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      MYSQL_DATABASE: ${SPRING_DATASOURCE_DATABASE}
+      MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
+      MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
